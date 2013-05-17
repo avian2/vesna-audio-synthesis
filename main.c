@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <errno.h>
 
 #include <libopencm3/stm32/f1/rcc.h>
@@ -142,7 +143,10 @@ static void setup(void)
 
 #define DDS_BUFF_SIZE	32
 
-dds_t dds_buffer[DDS_BUFF_SIZE];
+dds_t *dds_buffer;
+
+dds_t dds_buffer_1[DDS_BUFF_SIZE];
+dds_t dds_buffer_2[DDS_BUFF_SIZE];
 
 void exti4_isr(void)
 {
@@ -204,6 +208,9 @@ int main(void)
 	
 	printf("boot\n");
 
+	dds_t *backbuffer = dds_buffer_1;
+	dds_buffer = dds_buffer_2;
+
 	int ch = 25;
 
 	vss_cc_strobe(CC_STROBE_SIDLE);
@@ -220,11 +227,9 @@ int main(void)
 
 		while(cur_event < events_num) {
 
-			while(events[cur_event].time > vss_rtc_read());
-
 			unsigned tw = vss_dds_get_tuning_word(fs, events[cur_event].freq);
 
-			int i = 0;
+			unsigned i = 0;
 			if(events[cur_event].type) {
 				while(tw_list[i] != 0 && i < tw_num-1) i++;
 				tw_list[i] = tw;
@@ -235,7 +240,17 @@ int main(void)
 
 			printf("ev %d %u -> %u %u %u\n", i, tw, tw_list[0], tw_list[1], tw_list[2]);
 
-			vss_dds_fill_poly(dds_buffer, sizeof(dds_buffer), &output, tw_list, tw_num);
+			vss_dds_fill_poly(backbuffer, sizeof(dds_buffer_1), &output, tw_list, tw_num);
+
+			int waits = 0;
+			while(events[cur_event].time > vss_rtc_read()) waits++;
+			if(waits == 0) {
+				printf("OVERTIME!\n");
+			}
+
+			dds_t *t = dds_buffer;
+			dds_buffer = backbuffer;
+			backbuffer = t;
 
 			cur_event++;
 		}
