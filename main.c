@@ -13,6 +13,7 @@
 #include "platform/rtc.h"
 
 #include "dds.h"
+#include "event.h"
 #include "sin.h"
 
 /* Sync word qualifier mode = No preamble/sync 
@@ -193,38 +194,15 @@ void delay(void)
 int main(void)
 {
 	const float fs = 43.9796e3;
+
 	setup();
 
-	// fm = 32 kHz
-	// df = 4.943848 kHz
-	unsigned tw[2];
+	unsigned tw_num = 3;
+	unsigned tw_list[tw_num];
+
+	memset(tw_list, 0, sizeof(tw_list));
 	
-	tw[0] = vss_dds_get_tuning_word(199.813843e3, 4.1e3);
-	tw[1] = vss_dds_get_tuning_word(199.813843e3, 0.0e3);
-	//vss_cc_write_reg(CC_REG_DEVIATN, 0x14);
-
-	//printf("tw = %u\n", tw);
-	//printf("points per period = %f\n", ((float) sin_data_len)/tw);
-
-	/*
-	// fm = 3.9 kHz
-	// df = 14.831543 kHz
-	unsigned tw = vss_dds_get_tuning_word(sizeof(dds_buffer), 2, 199.813843e3, 3.9e3);
-	vsnCC_write(CC_REG_DEVIATN, 0x31);
-	*/
-
-	/*
-	// fm = 13.4 kHz
-	// df = 32.958984 kHz
-	unsigned tw = vss_dds_get_tuning_word(sizeof(dds_buffer), 2, 199.813843e3, 13.4e3);
-	*/
-	//vss_cc_write_reg(CC_REG_DEVIATN, 0x42);
-	vss_cc_write_reg(CC_REG_DEVIATN, 0x42);
-
-	printf("Radio setup done\n");
-
-	//vss_dds_fill(dds_buffer, sizeof(dds_buffer), &output, tw);
-	vss_dds_fill_poly(dds_buffer, sizeof(dds_buffer), &output, tw, 1);
+	printf("boot\n");
 
 	int ch = 25;
 
@@ -238,12 +216,29 @@ int main(void)
 		vss_cc_wait_state(CC_MARCSTATE_TX);
 
 		while(1) {
-			int f;
-			for(f = 100; f < 2000; f += 10) {
-				tw[0] = vss_dds_get_tuning_word(fs, f);
-				printf("f = %d, tw = %u\n", f, tw[0]);
-				vss_dds_fill_poly(dds_buffer, sizeof(dds_buffer), &output, tw, 1);
-				delay();
+			vss_rtc_reset();
+			unsigned cur_event = 0;
+
+			while(cur_event < events_num) {
+
+				while(events[cur_event].time > vss_rtc_read());
+
+				unsigned tw = vss_dds_get_tuning_word(fs, events[cur_event].freq);
+
+				int i = 0;
+				if(events[cur_event].type) {
+					while(tw_list[i] != 0 && i < tw_num-1) i++;
+					tw_list[i] = tw;
+				} else {
+					while(tw_list[i] != tw && i < tw_num-1) i++;
+					tw_list[i] = 0;
+				}
+
+				printf("ev %d %u -> %u %u %u\n", i, tw, tw_list[0], tw_list[1], tw_list[2]);
+
+				vss_dds_fill_poly(dds_buffer, sizeof(dds_buffer), &output, tw_list, tw_num);
+
+				cur_event++;
 			}
 		}
 	}

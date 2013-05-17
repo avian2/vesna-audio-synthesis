@@ -32,7 +32,7 @@ all: $(BINARY).bin
 %.csv: %.mid
 	$(MIDICSV) $< $@
 
-%-notes.c: %.csv
+%-notes.c: %.csv generate-notes.py
 	python generate-notes.py $< > $@
 
 sin.c: generate-sin.py
