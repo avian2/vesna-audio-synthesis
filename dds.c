@@ -71,10 +71,12 @@ void vss_dds_fill_poly(dds_t* buffer, size_t size, const struct vss_dds_output* 
 		int acc = 0;
 
 		for(m = 0; m < tw_num; m++) {
-			//printf("ph = %u\n", phase[m]);
-			acc += sin_data[phase[m]];
-			//printf("acc = %d\n", (int) acc);
-			phase[m] = (phase[m] + tw_list[m]) % sin_data_len;
+			if(tw_list[m] > 0) {
+				//printf("ph = %u\n", phase[m]);
+				acc += sin_data[phase[m]];
+				//printf("acc = %d\n", (int) acc);
+				phase[m] = (phase[m] + tw_list[m]) % sin_data_len;
+			}
 		}
 
 		acc /= tw_num;
