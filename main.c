@@ -224,10 +224,11 @@ int main(void)
 	while(1) {
 		vss_rtc_reset();
 		unsigned cur_event = 0;
+		unsigned cur_time;
 
 		while(cur_event < events_num) {
 
-			unsigned cur_time = events[cur_event].time;
+			cur_time = events[cur_event].time;
 
 			while(events[cur_event].time == cur_time && cur_event < events_num) { 
 				unsigned tw = vss_dds_get_tuning_word(fs, events[cur_event].freq);
@@ -258,5 +259,7 @@ int main(void)
 			dds_buffer = backbuffer;
 			backbuffer = t;
 		}
+
+		while(cur_time + 10000 > vss_rtc_read());
 	}
 }
