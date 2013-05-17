@@ -8,7 +8,7 @@ def note_to_f(note):
 	return (2.0**((float(note)-69.0)/12.0)) * 440.0
 
 def timestamp_to_s(ticks, ticks_per_qn, us_per_qn):
-	return 1.0e-6*float(ticks)/float(ticks_per_qn)*float(us_per_qn)
+	return 1.0e-6*float(ticks)/float(ticks_per_qn)*float(us_per_qn)*0.9
 
 def main():
 	fin = open(sys.argv[1])
