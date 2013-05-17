@@ -206,40 +206,38 @@ int main(void)
 
 	int ch = 25;
 
+	vss_cc_strobe(CC_STROBE_SIDLE);
+	vss_cc_wait_state(CC_MARCSTATE_IDLE);
+
+	vss_cc_write_reg(CC_REG_CHANNR, ch);
+
+	vss_cc_strobe(CC_STROBE_STX);
+	vss_cc_wait_state(CC_MARCSTATE_TX);
+
 	while(1) {
-		vss_cc_strobe(CC_STROBE_SIDLE);
-		vss_cc_wait_state(CC_MARCSTATE_IDLE);
+		vss_rtc_reset();
+		unsigned cur_event = 0;
 
-		vss_cc_write_reg(CC_REG_CHANNR, ch);
+		while(cur_event < events_num) {
 
-		vss_cc_strobe(CC_STROBE_STX);
-		vss_cc_wait_state(CC_MARCSTATE_TX);
+			while(events[cur_event].time > vss_rtc_read());
 
-		while(1) {
-			vss_rtc_reset();
-			unsigned cur_event = 0;
+			unsigned tw = vss_dds_get_tuning_word(fs, events[cur_event].freq);
 
-			while(cur_event < events_num) {
-
-				while(events[cur_event].time > vss_rtc_read());
-
-				unsigned tw = vss_dds_get_tuning_word(fs, events[cur_event].freq);
-
-				int i = 0;
-				if(events[cur_event].type) {
-					while(tw_list[i] != 0 && i < tw_num-1) i++;
-					tw_list[i] = tw;
-				} else {
-					while(tw_list[i] != tw && i < tw_num-1) i++;
-					tw_list[i] = 0;
-				}
-
-				printf("ev %d %u -> %u %u %u\n", i, tw, tw_list[0], tw_list[1], tw_list[2]);
-
-				vss_dds_fill_poly(dds_buffer, sizeof(dds_buffer), &output, tw_list, tw_num);
-
-				cur_event++;
+			int i = 0;
+			if(events[cur_event].type) {
+				while(tw_list[i] != 0 && i < tw_num-1) i++;
+				tw_list[i] = tw;
+			} else {
+				while(tw_list[i] != tw && i < tw_num-1) i++;
+				tw_list[i] = 0;
 			}
+
+			printf("ev %d %u -> %u %u %u\n", i, tw, tw_list[0], tw_list[1], tw_list[2]);
+
+			vss_dds_fill_poly(dds_buffer, sizeof(dds_buffer), &output, tw_list, tw_num);
+
+			cur_event++;
 		}
 	}
 }
