@@ -11,10 +11,12 @@ LDFLAGS		+= -Wl,--start-group -lc -lgcc -lnosys -Wl,--end-group \
 		   -L$(TOOLCHAIN_DIR)/lib -L$(TOOLCHAIN_DIR)/lib/stm32/f1 \
 		   -T$(LDSCRIPT) -nostartfiles -Wl,--gc-sections \
 		   -mthumb -march=armv7 -mfix-cortex-m3-ldrd -msoft-float
-OBJS		+= main.o sin.o dds.o platform/cc.o platform/rtc.o
+OBJS		+= main.o sin.o dds.o platform/cc.o platform/rtc.o smile-notes.o
 
 OPENOCD		?= openocd
 OPENOCD_PARAMS  ?= -f interface/olimex-arm-usb-ocd.cfg -f target/stm32f1x.cfg
+
+MIDICSV		= $(HOME)/src/midicsv-1.1/midicsv
 
 all: $(BINARY).bin
 
@@ -27,8 +29,14 @@ all: $(BINARY).bin
 %.o: %.c Makefile
 	$(CC) $(CFLAGS) -o $@ -c $<
 
+%.csv: %.mid
+	$(MIDICSV) $< $@
+
+%-notes.c: %.csv
+	python generate-notes.py $< > $@
+
 sin.c: generate-sin.py
-	python generate-sin.py 1024 > sin.c
+	python generate-sin.py 1024 > $@
 
 clean:
 	rm -f *.o

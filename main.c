@@ -19,7 +19,7 @@
  * CRC autoflush = false 
  * Channel spacing = 199.813843 
  * Data format = Synchronous serial mode 
- * Data rate = 199.814 
+ * Data rate = 43.9796 
  * RX filter BW = 210.937500 
  * PA ramping = false 
  * Preamble count = 4 
@@ -30,7 +30,7 @@
  * TX power = 0 
  * Manchester enable = false 
  * CRC enable = false 
- * Deviation = 4.943848 
+ * Deviation = 32.958984 
  * Packet length mode = Infinite packet length mode 
  * Packet length = 255 
  * Modulation format = 4-FSK 
@@ -46,13 +46,15 @@ static const uint8_t init_seq[] = {
 	CC_REG_FREQ2,    0x1C,     // Frequency Control Word, High Byte
 	CC_REG_FREQ1,    0xE3,     // Frequency Control Word, Middle Byte
 	CC_REG_FREQ0,    0x8E,     // Frequency Control Word, Low Byte
-	CC_REG_MDMCFG3,  0xE5,     // Modem Configuration
+	CC_REG_MDMCFG4,  0x8A,     // Modem Configuration
+	CC_REG_MDMCFG3,  0xAB,     // Modem Configuration
 	CC_REG_MDMCFG2,  0x40,     // Modem Configuration
 	CC_REG_MDMCFG0,  0xE5,     // Modem Configuration
+	CC_REG_DEVIATN,  0x42,     // Modem Deviation Setting
 	CC_REG_MCSM0,    0x18,     // Main Radio Control State Machine Configuration
 	CC_REG_FOCCFG,   0x16,     // Frequency Offset Compensation Configuration
 	CC_REG_WORCTRL,  0xFB,     // Wake On Radio Control
-	CC_REG_FSCAL3,   0xEA,     // Frequency Synthesizer Calibration
+	CC_REG_FSCAL3,   0xE9,     // Frequency Synthesizer Calibration
 	CC_REG_FSCAL2,   0x2A,     // Frequency Synthesizer Calibration
 	CC_REG_FSCAL1,   0x00,     // Frequency Synthesizer Calibration
 	CC_REG_FSCAL0,   0x1F,     // Frequency Synthesizer Calibration
@@ -190,6 +192,7 @@ void delay(void)
 
 int main(void)
 {
+	const float fs = 43.9796e3;
 	setup();
 
 	// fm = 32 kHz
@@ -237,7 +240,7 @@ int main(void)
 		while(1) {
 			int f;
 			for(f = 100; f < 2000; f += 10) {
-				tw[0] = vss_dds_get_tuning_word(199.813843e3, f);
+				tw[0] = vss_dds_get_tuning_word(fs, f);
 				printf("f = %d, tw = %u\n", f, tw[0]);
 				vss_dds_fill_poly(dds_buffer, sizeof(dds_buffer), &output, tw, 1);
 				delay();
