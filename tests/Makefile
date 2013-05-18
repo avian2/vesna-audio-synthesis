@@ -21,6 +21,9 @@ test_dds_runner: test_dds_runner.o test_dds.o dds.o sin.o $(UNITY_OBJ)
 test_%_runner: test_%_runner.o test_%.o %.o $(UNITY_OBJ)
 	$(CC) $(CFLAGS) -o $@ $^
 
+vesna-fm-synthesis-host: main-unix.o smile-notes.o dds.o sin.o
+	$(CC) $(CFLAGS) -o $@ $^
+
 %.d: %.c
 	@set -e; rm -f $@; \
 	$(CC) -M $(CFLAGS) $< > $@.$$$$; \
