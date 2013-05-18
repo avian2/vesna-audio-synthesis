@@ -14,4 +14,5 @@ extern const struct event events[];
 
 extern const size_t events_num;
 
+extern const unsigned max_channels;
 #endif

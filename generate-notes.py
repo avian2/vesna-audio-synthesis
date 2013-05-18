@@ -13,8 +13,6 @@ def timestamp_to_s(ticks, ticks_per_qn, us_per_qn):
 def main():
 	fin = open(sys.argv[1])
 
-	track = 2
-
 	sys.stdout.write('#include "event.h"\n\n')
 
 	sys.stdout.write('const struct event events[] = {\n')
@@ -22,11 +20,17 @@ def main():
 	start = True
 
 	count = 0
+	channels = 0
+	max_channels = 0
 
+	data = []
 	for line in fin:
-
 		fields = [ f.strip() for f in line.split(",") ]
+		data.append(fields)
 
+	data.sort(key=lambda x: int(x[1]))
+
+	for fields in data:
 		cmd = fields[2]
 
 		if cmd == 'Header':
@@ -37,7 +41,7 @@ def main():
 			us_per_qn = int(fields[3])
 			continue
 
-		if int(fields[0]) != track:
+		if int(fields[0]) == 1:
 			continue
 
 		time = timestamp_to_s(fields[1], ticks_per_qn, us_per_qn)
@@ -50,13 +54,19 @@ def main():
 				sys.stdout.write(",\n");
 			sys.stdout.write('\t{ .time = %d, .type = 1, .freq = %f }' % (time*1e3, f));
 			count += 1
+			channels += 1
+			max_channels = max(max_channels, channels)
+
 		elif cmd == 'Note_off_c':
 			f = note_to_f(fields[4])
 			sys.stdout.write(',\n\t{ .time = %d, .type = 0, .freq = %f }' % (time*1e3, f));
 			count += 1
+			channels -= 1
 
 	sys.stdout.write("\n};\n\n");
 
-	sys.stdout.write("const size_t events_num = %d;\n" % (count,))
+	sys.stdout.write("const size_t events_num = %d;\n\n" % (count,))
+
+	sys.stdout.write("const unsigned max_channels = %d;\n" % (max_channels,))
 
 main()

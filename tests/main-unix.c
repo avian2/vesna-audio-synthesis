@@ -39,8 +39,7 @@ int main(void)
 {
 	const float fs = 44100.0;
 
-	unsigned tw_num = 3;
-	unsigned tw_list[tw_num];
+	unsigned tw_list[max_channels];
 
 	memset(tw_list, 0, sizeof(tw_list));
 
@@ -65,10 +64,10 @@ int main(void)
 
 				unsigned i = 0;
 				if(events[cur_event].type) {
-					while(tw_list[i] != 0 && i < tw_num-1) i++;
+					while(tw_list[i] != 0 && i < max_channels -1) i++;
 					tw_list[i] = tw;
 				} else {
-					while(tw_list[i] != tw && i < tw_num-1) i++;
+					while(tw_list[i] != tw && i < max_channels -1) i++;
 					tw_list[i] = 0;
 				}
 
@@ -78,7 +77,7 @@ int main(void)
 				cur_event++;
 			}
 
-			vss_dds_fill_poly(dds_buffer, sizeof(dds_buffer), &output, tw_list, tw_num);
+			vss_dds_fill_poly(dds_buffer, sizeof(dds_buffer), &output, tw_list, max_channels);
 		}
 	}
 }
