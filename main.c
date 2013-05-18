@@ -15,7 +15,7 @@
 
 #include "dds.h"
 #include "event.h"
-#include "sin.h"
+#include "wavetable.h"
 
 /* Sync word qualifier mode = No preamble/sync 
  * CRC autoflush = false 
@@ -224,7 +224,7 @@ int main(void)
 	while(1) {
 		vss_rtc_reset();
 		unsigned cur_event = 0;
-		unsigned cur_time;
+		unsigned cur_time = 0;
 
 		while(cur_event < events_num) {
 

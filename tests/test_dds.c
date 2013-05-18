@@ -17,7 +17,7 @@
 /* Author: Tomaz Solc, <tomaz.solc@ijs.si> */
 #include "unity.h"
 #include "dds.h"
-#include "sin.h"
+#include "wavetable.h"
 
 const unsigned out_1bit_words[] = { 1, 0, 0, 1 };
 
@@ -54,12 +54,12 @@ void tearDown(void)
 void test_get_tuning_word_min(void)
 {
 	unsigned tw = vss_dds_get_tuning_word(1.0, 0.5);
-	TEST_ASSERT_EQUAL(sin_data_len/2, tw);
+	TEST_ASSERT_EQUAL(wavetable_len/2, tw);
 }
 
 void test_get_tuning_word_max(void)
 {
-	unsigned tw = vss_dds_get_tuning_word(1.0, 1.0/sin_data_len);
+	unsigned tw = vss_dds_get_tuning_word(1.0, 1.0/wavetable_len);
 	TEST_ASSERT_EQUAL(1, tw);
 }
 
@@ -119,7 +119,7 @@ void test_fill_poly_max(void)
 {
 	dds_t buffer[2];
 
-	unsigned tw = sin_data_len/2;
+	unsigned tw = wavetable_len/2;
 
 	vss_dds_fill_poly(buffer, sizeof(buffer), &out_2bit_poly, &tw, 1);
 
@@ -131,7 +131,7 @@ void test_fill_poly_some(void)
 {
 	dds_t buffer[2];
 
-	unsigned tw = sin_data_len/32;
+	unsigned tw = wavetable_len/32;
 
 	vss_dds_fill_poly(buffer, sizeof(buffer), &out_2bit_poly, &tw, 1);
 
@@ -144,8 +144,8 @@ void test_fill_poly_two(void)
 	dds_t buffer[2];
 
 	unsigned tw[] = {
-		sin_data_len/32,
-		sin_data_len/16 };
+		wavetable_len/32,
+		wavetable_len/16 };
 
 	vss_dds_fill_poly(buffer, sizeof(buffer), &out_2bit_poly, tw, 2);
 

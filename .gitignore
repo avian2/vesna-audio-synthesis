@@ -2,3 +2,7 @@
 *.d
 *.elf
 *.o
+wavetable.c
+*.csv
+*.mid
+tags

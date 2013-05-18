@@ -5,7 +5,7 @@
 
 #include "dds.h"
 #include "event.h"
-#include "sin.h"
+#include "wavetable.h"
 
 static const unsigned output_words[] = { 0, 85, 170, 255 };
 

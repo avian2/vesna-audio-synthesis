@@ -3,11 +3,11 @@ import sys
 
 length = int(sys.argv[1])
 
-sys.stdout.write('#include "sin.h"\n\n');
+sys.stdout.write('#include "wavetable.h"\n\n');
 
-sys.stdout.write("const size_t sin_data_len = %d;\n\n" % length);
+sys.stdout.write("const size_t wavetable_len = %d;\n\n" % length);
 
-sys.stdout.write("const int8_t sin_data[] = {")
+sys.stdout.write("const int8_t wavetable[] = {")
 
 for n in xrange(length):
 	if n % 8 == 0:

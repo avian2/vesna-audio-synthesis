@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
-extern const size_t sin_data_len;
-extern const int8_t sin_data[];
+extern const size_t wavetable_len;
+extern const int8_t wavetable[];
 
 #endif
