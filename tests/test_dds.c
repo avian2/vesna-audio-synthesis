@@ -123,8 +123,8 @@ void test_fill_poly_max(void)
 
 	vss_dds_fill_poly(buffer, sizeof(buffer), &out_2bit_poly, &tw, 1);
 
-	TEST_ASSERT_EQUAL_HEX(0xCCCCCCCC, buffer[0]);
-	TEST_ASSERT_EQUAL_HEX(0xCCCCCCCC, buffer[1]);
+	TEST_ASSERT_EQUAL_HEX(0x88888888, buffer[0]);
+	TEST_ASSERT_EQUAL_HEX(0x88888888, buffer[1]);
 }
 
 void test_fill_poly_some(void)
@@ -135,8 +135,8 @@ void test_fill_poly_some(void)
 
 	vss_dds_fill_poly(buffer, sizeof(buffer), &out_2bit_poly, &tw, 1);
 
-	TEST_ASSERT_EQUAL_HEX(0xFFEA5000, buffer[0]);
-	TEST_ASSERT_EQUAL_HEX(0x0016AFFF, buffer[1]);
+	TEST_ASSERT_EQUAL_HEX(0xAAAAA540, buffer[0]);
+	TEST_ASSERT_EQUAL_HEX(0x056AAAAA, buffer[1]);
 }
 
 void test_fill_poly_two(void)
@@ -149,6 +149,6 @@ void test_fill_poly_two(void)
 
 	vss_dds_fill_poly(buffer, sizeof(buffer), &out_2bit_poly, tw, 2);
 
-	TEST_ASSERT_EQUAL_HEX(0xAABFA500, buffer[0]);
-	TEST_ASSERT_EQUAL_HEX(0x016BFAAA, buffer[1]);
+	TEST_ASSERT_EQUAL_HEX(0x6AAAA950, buffer[0]);
+	TEST_ASSERT_EQUAL_HEX(0x15AAAAA5, buffer[1]);
 }
