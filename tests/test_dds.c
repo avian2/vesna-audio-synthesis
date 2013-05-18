@@ -53,13 +53,13 @@ void tearDown(void)
 
 void test_get_tuning_word_min(void)
 {
-	unsigned tw = vss_dds_get_tuning_word(&out_1bit, 1.0, 0.5);
+	unsigned tw = vss_dds_get_tuning_word(1.0, 0.5);
 	TEST_ASSERT_EQUAL(sin_data_len/2, tw);
 }
 
 void test_get_tuning_word_max(void)
 {
-	unsigned tw = vss_dds_get_tuning_word(&out_1bit, 1.0, 1.0/sin_data_len);
+	unsigned tw = vss_dds_get_tuning_word(1.0, 1.0/sin_data_len);
 	TEST_ASSERT_EQUAL(1, tw);
 }
 
@@ -111,8 +111,8 @@ void test_fill_poly_zero(void)
 
 	vss_dds_fill_poly(buffer, sizeof(buffer), &out_2bit_poly, &tw, 1);
 
-	TEST_ASSERT_EQUAL_HEX(0x00000000, buffer[0]);
-	TEST_ASSERT_EQUAL_HEX(0x00000000, buffer[1]);
+	TEST_ASSERT_EQUAL_HEX(0xAAAAAAAA, buffer[0]);
+	TEST_ASSERT_EQUAL_HEX(0xAAAAAAAA, buffer[1]);
 }
 
 void test_fill_poly_max(void)
