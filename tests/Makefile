@@ -21,7 +21,7 @@ test_dds_runner: test_dds_runner.o test_dds.o dds.o wavetable.o $(UNITY_OBJ)
 test_%_runner: test_%_runner.o test_%.o %.o $(UNITY_OBJ)
 	$(CC) $(CFLAGS) -o $@ $^
 
-vesna-fm-synthesis-host: main-unix.o smile-notes.o dds.o wavetable.o
+vesna-fm-synthesis-host: main-unix.o smile-notes.o dds.o wavetable.o event.o
 	$(CC) $(CFLAGS) -o $@ $^
 
 %.d: %.c

@@ -170,19 +170,13 @@ void exti4_isr(void)
 }
 
 /* Provide _write syscall used by libc */
-int _write(int file, char *ptr, int len)
+int _write(int file __attribute__((unused)), char *ptr, int len)
 {
 	int i;
-
-	if (file == 1) {
-		for (i = 0; i < len; i++) {
-			usart_send_blocking(USART1, ptr[i]);
-		}
-		return i;
-	} else {
-		errno = EIO;
-		return -1;
+	for(i = 0; i < len; i++) {
+		usart_send_blocking(USART1, ptr[i]);
 	}
+	return i;
 }
 
 /* Delay execution for some arbitrary amount of time */

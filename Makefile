@@ -11,7 +11,7 @@ LDFLAGS		+= -Wl,--start-group -lc -lgcc -lnosys -Wl,--end-group \
 		   -L$(TOOLCHAIN_DIR)/lib -L$(TOOLCHAIN_DIR)/lib/stm32/f1 \
 		   -T$(LDSCRIPT) -nostartfiles -Wl,--gc-sections \
 		   -mthumb -march=armv7 -mfix-cortex-m3-ldrd -msoft-float
-OBJS		+= main.o wavetable.o dds.o platform/cc.o platform/rtc.o smile-notes.o
+OBJS		+= main.o wavetable.o dds.o event.o platform/cc.o platform/rtc.o smile-notes.o
 
 OPENOCD		?= openocd
 OPENOCD_PARAMS  ?= -f interface/olimex-arm-usb-ocd.cfg -f target/stm32f1x.cfg
