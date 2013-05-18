@@ -217,34 +217,18 @@ int main(void)
 
 	while(1) {
 		vss_rtc_reset();
-		unsigned cur_event = 0;
-		unsigned cur_time = 0;
 
-		while(cur_event < events_num) {
+		struct sequencer seq;
+		sequencer_init(&seq, fs);
 
-			cur_time = events[cur_event].time;
+		while(seq.cur_event < events_num) {
 
-			while(events[cur_event].time == cur_time && cur_event < events_num) { 
-				unsigned tw = vss_dds_get_tuning_word(fs, events[cur_event].freq);
+			seq.cur_time = events[seq.cur_event].time;
 
-				unsigned i = 0;
-				if(events[cur_event].type) {
-					while(tw_list[i] != 0 && i < tw_num-1) i++;
-					tw_list[i] = tw;
-				} else {
-					while(tw_list[i] != tw && i < tw_num-1) i++;
-					tw_list[i] = 0;
-				}
-
-				printf("ev %d %u -> %u %u %u\n", i, tw, tw_list[0], tw_list[1], tw_list[2]);
-
-				cur_event++;
-			}
-
-			vss_dds_fill_poly(backbuffer, sizeof(dds_buffer_1), &output, tw_list, tw_num);
+			sequencer_next(&seq, &output, backbuffer, sizeof(dds_buffer_1));
 
 			int waits = 0;
-			while(cur_time > vss_rtc_read()) waits++;
+			while(seq.cur_time > vss_rtc_read()) waits++;
 			if(waits == 0) {
 				printf("OVERTIME!\n");
 			}
@@ -254,6 +238,6 @@ int main(void)
 			backbuffer = t;
 		}
 
-		while(cur_time + 10000 > vss_rtc_read());
+		while(seq.cur_time + 10000 > vss_rtc_read());
 	}
 }
