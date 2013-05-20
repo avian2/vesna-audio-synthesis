@@ -29,7 +29,7 @@ void sequencer_next(struct sequencer* seq, const struct vss_dds_output* output,
 			seq->tw_list[i] = 0;
 		}
 
-		fprintf(stderr, "ev %u -> %u\n", tw, i);
+		//fprintf(stderr, "ev %u -> %u\n", tw, i);
 
 		seq->cur_event++;
 	}

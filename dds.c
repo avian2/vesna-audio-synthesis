@@ -55,7 +55,14 @@ void vss_dds_fill(dds_t* buffer, size_t size, const struct vss_dds_output* outpu
 
 unsigned vss_dds_quant(int acc, unsigned ch_num, unsigned bits)
 {
-	return (acc + (int)256 * ch_num/2 - 1) * (int) bits / (int) ch_num / 256;
+	int q = (acc + (int)256 * ch_num/2 - 1) * (int) bits / (int) ch_num / 256;
+	if(q < 0) {
+		return 0;
+	} else if(q > bits - 1) {
+		return bits - 1;
+	} else {
+		return q;
+	}
 }
 
 void vss_dds_fill_poly(dds_t* buffer, size_t size, const struct vss_dds_output* output, unsigned* tw_list, int* attn_list, size_t tw_num)
@@ -84,7 +91,7 @@ void vss_dds_fill_poly(dds_t* buffer, size_t size, const struct vss_dds_output* 
 			}
 		}
 
-		const int i = vss_dds_quant(acc, tw_num, output->size);
+		const int i = vss_dds_quant(acc, 3, output->size);
 		
 		const unsigned ow = output->words[i];
 
