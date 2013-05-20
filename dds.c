@@ -1,7 +1,7 @@
 #include <string.h>
 
 #include "dds.h"
-#include "sin.h"
+#include "wavetable.h"
 
 /** @brief How many output words in a dds_t value? */
 static unsigned get_dds_word_size(unsigned bits)
@@ -22,7 +22,7 @@ static unsigned get_dds_size(size_t size, unsigned bits)
  * @param f Desired synthesizer frequency. */
 unsigned vss_dds_get_tuning_word(float fs, float f)
 {
-	return sin_data_len * f / fs;
+	return wavetable_len * f / fs;
 }
 
 /** @brief Fill direct digital synthesis buffer.
@@ -53,7 +53,7 @@ void vss_dds_fill(dds_t* buffer, size_t size, const struct vss_dds_output* outpu
 	}
 }
 
-void vss_dds_fill_poly(dds_t* buffer, size_t size, const struct vss_dds_output* output, unsigned* tw_list, size_t tw_num)
+void vss_dds_fill_poly(dds_t* buffer, size_t size, const struct vss_dds_output* output, unsigned* tw_list, int* attn_list, size_t tw_num)
 {
 	memset(buffer, 0, size);
 
@@ -73,9 +73,9 @@ void vss_dds_fill_poly(dds_t* buffer, size_t size, const struct vss_dds_output* 
 		for(m = 0; m < tw_num; m++) {
 			if(tw_list[m] > 0) {
 				//printf("ph = %u\n", phase[m]);
-				acc += sin_data[phase[m]];
+				acc += wavetable[phase[m]] / attn_list[m];
 				//printf("acc = %d\n", (int) acc);
-				phase[m] = (phase[m] + tw_list[m]) % sin_data_len;
+				phase[m] = (phase[m] + tw_list[m]) % wavetable_len;
 			}
 		}
 
