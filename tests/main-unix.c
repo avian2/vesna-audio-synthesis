@@ -39,10 +39,6 @@ int main(void)
 {
 	const float fs = 44100.0;
 
-	unsigned tw_list[max_channels];
-
-	memset(tw_list, 0, sizeof(tw_list));
-	
 	while(1) {
 		struct sequencer seq;
 		sequencer_init(&seq, fs);
