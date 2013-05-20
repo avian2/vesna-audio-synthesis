@@ -108,7 +108,7 @@ static void setup_radio(void)
 
 	/* Configure the EXTI subsystem. */
 	exti_select_source(EXTI4, GPIOA);
-	exti_set_trigger(EXTI4, EXTI_TRIGGER_FALLING);
+	exti_set_trigger(EXTI4, EXTI_TRIGGER_RISING);
 	exti_enable_request(EXTI4);
 	exti_reset_request(EXTI4);
 
@@ -144,13 +144,12 @@ void exti4_isr(void)
 	static uint32_t p = 0;
 	exti_reset_request(EXTI4);
 
-	p = (p + 1) % DDS_BUFF_SIZE;
-
 	if(dds_buffer[p]) {
 		GPIO_BSRR(GPIOA) = GPIO2;
 	} else {
 		GPIO_BRR(GPIOA) = GPIO2;
 	}
+	p = (p + 1) % DDS_BUFF_SIZE;
 }
 
 /* Provide _write syscall used by libc */

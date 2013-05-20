@@ -84,11 +84,11 @@ void vss_dds_fill_poly(dds_t* buffer, size_t size, unsigned* tw_list, int* attn_
 				//printf("ph = %u\n", phase[m]);
 				acc += wavetable[phase[m]]; // / attn_list[m];
 				//printf("acc = %d\n", (int) acc);
-				phase[m] = (phase[m] + tw_list[m]) % wavetable_len;
+				phase[m] = (phase[m] + tw_list[m]) % 1024;
 			}
 		}
 
-		const int i = vss_dds_quant(acc, tw_num, dsmul+1);
+		const int i = 0; //= vss_dds_quant(acc, tw_num, dsmul+1);
 
 		for(m = 0; m < dsmul; m++) {
 			buffer[p] = m < i;
