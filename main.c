@@ -21,7 +21,7 @@
  * CRC autoflush = false 
  * Channel spacing = 199.813843 
  * Data format = Synchronous serial mode 
- * Data rate = 43.9796 
+ * Data rate = 399.628
  * RX filter BW = 210.937500 
  * PA ramping = false 
  * Preamble count = 4 
@@ -35,7 +35,7 @@
  * Deviation = 32.958984 
  * Packet length mode = Infinite packet length mode 
  * Packet length = 255 
- * Modulation format = 4-FSK 
+ * Modulation format = 2-FSK
  * Base frequency = 779.999908 
  * Modulated = true 
  * Channel number = 0 */
@@ -48,30 +48,21 @@ static const uint8_t init_seq[] = {
 	CC_REG_FREQ2,    0x1C,     // Frequency Control Word, High Byte
 	CC_REG_FREQ1,    0xE3,     // Frequency Control Word, Middle Byte
 	CC_REG_FREQ0,    0x8E,     // Frequency Control Word, Low Byte
-	CC_REG_MDMCFG4,  0x8A,     // Modem Configuration
-	CC_REG_MDMCFG3,  0xAB,     // Modem Configuration
-	CC_REG_MDMCFG2,  0x40,     // Modem Configuration
+	CC_REG_MDMCFG4,  0x8D,     // Modem Configuration
+	CC_REG_MDMCFG3,  0xE5,     // Modem Configuration
+	CC_REG_MDMCFG2,  0x00,     // Modem Configuration
 	CC_REG_MDMCFG0,  0xE5,     // Modem Configuration
 	CC_REG_DEVIATN,  0x42,     // Modem Deviation Setting
 	CC_REG_MCSM0,    0x18,     // Main Radio Control State Machine Configuration
 	CC_REG_FOCCFG,   0x16,     // Frequency Offset Compensation Configuration
 	CC_REG_WORCTRL,  0xFB,     // Wake On Radio Control
-	CC_REG_FSCAL3,   0xE9,     // Frequency Synthesizer Calibration
+	CC_REG_FSCAL3,   0xEA,     // Frequency Synthesizer Calibration
 	CC_REG_FSCAL2,   0x2A,     // Frequency Synthesizer Calibration
 	CC_REG_FSCAL1,   0x00,     // Frequency Synthesizer Calibration
 	CC_REG_FSCAL0,   0x1F,     // Frequency Synthesizer Calibration
 	CC_REG_TEST2,    0x81,     // Various Test Settings
 	CC_REG_TEST1,    0x35,     // Various Test Settings
 	0xFF, 0x0FF
-};
-
-//static const unsigned output_words[] = { 3, 3, 1, 0, 2, 2, 2, 2, 0, 1, 3, 3 };
-static const unsigned output_words[] = { 3, 2, 0, 1 };
-
-static const struct vss_dds_output output = {
-	.bits = 2,
-	.size = sizeof(output_words)/sizeof(*output_words),
-	.words = output_words
 };
 
 /* Set up all the peripherals */
@@ -141,7 +132,7 @@ static void setup(void)
 	setup_radio();
 }
 
-#define DDS_BUFF_SIZE	64
+#define DDS_BUFF_SIZE	20480
 
 dds_t *dds_buffer;
 
@@ -150,23 +141,16 @@ dds_t dds_buffer_2[DDS_BUFF_SIZE];
 
 void exti4_isr(void)
 {
-	static uint32_t p = 0, w = 0;
+	static uint32_t p = 0;
 	exti_reset_request(EXTI4);
 
-	if((dds_buffer[p] >> w) & 0x00000001) {
+	if(dds_buffer[p]) {
 		gpio_set(GPIOA, GPIO2);
 	} else {
 		gpio_clear(GPIOA, GPIO2);
 	}
 
-	w++;
-	if(w == sizeof(dds_t)*8) {
-		w = 0;
-		p++;
-		if(p == DDS_BUFF_SIZE) {
-			p = 0;
-		}
-	}
+	p = (p + 1) % DDS_BUFF_SIZE;
 }
 
 /* Provide _write syscall used by libc */
@@ -191,7 +175,7 @@ void delay(void)
 
 int main(void)
 {
-	const float fs = 43.9796e3;
+	const float fs = 39.9628e3;
 
 	setup();
 
@@ -204,6 +188,24 @@ int main(void)
 
 	dds_t *backbuffer = dds_buffer_1;
 	dds_buffer = dds_buffer_2;
+
+	/*
+	int n, p = 0;
+	int tw = 35;
+	const int ps = DDS_BUFF_SIZE/wavetable_len;
+	for(n = 0; n < wavetable_len; n++) {
+		int m;
+		int v = wavetable[(n*tw)%wavetable_len];
+		v += 127;
+
+		int pt = v*ps/254;
+
+		for(m = 0; m < ps; m++) {
+			dds_buffer[p] = m > pt;
+			p++;
+		}
+	}
+	*/
 
 	int ch = 25;
 
@@ -225,7 +227,7 @@ int main(void)
 
 			seq.cur_time = events[seq.cur_event].time;
 
-			sequencer_next(&seq, &output, backbuffer, sizeof(dds_buffer_1));
+			sequencer_next(&seq, backbuffer, sizeof(dds_buffer_1));
 
 			int waits = 0;
 			while(seq.cur_time > vss_rtc_read()) waits++;

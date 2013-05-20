@@ -65,20 +65,17 @@ unsigned vss_dds_quant(int acc, unsigned ch_num, unsigned bits)
 	}
 }
 
-void vss_dds_fill_poly(dds_t* buffer, size_t size, const struct vss_dds_output* output, unsigned* tw_list, int* attn_list, size_t tw_num)
+void vss_dds_fill_poly(dds_t* buffer, size_t size, unsigned* tw_list, int* attn_list, size_t tw_num)
 {
 	memset(buffer, 0, size);
 
-	const unsigned dds_size = get_dds_size(size, output->bits);
-	const unsigned dds_word_size = get_dds_word_size(output->bits);
-
 	unsigned phase[tw_num];
-	unsigned n;
+	unsigned p;
 
 	memset(phase, 0, sizeof(phase));
 
-	for(n = 0; n < dds_size; n++) {
-
+	p = 0;
+	while(p < size) {
 		unsigned m;
 		int acc = 0;
 
@@ -91,13 +88,12 @@ void vss_dds_fill_poly(dds_t* buffer, size_t size, const struct vss_dds_output* 
 			}
 		}
 
-		const int i = vss_dds_quant(acc, 3, output->size);
-		
-		const unsigned ow = output->words[i];
+		const int i = vss_dds_quant(acc, 3, 11);
 
-		const unsigned p = n / dds_word_size;
-		const unsigned w = n % dds_word_size * output->bits;
-
-		buffer[p] |= (ow << w);
+		for(m = 0; m < 10; m++) {
+			buffer[p] = m < i;
+			p++;
+			if(p == size) break;
+		}
 	}
 }
