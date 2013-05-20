@@ -108,11 +108,12 @@ void test_fill_poly_zero(void)
 	dds_t buffer[2];
 
 	unsigned tw = 0;
+	int attn = 1;
 
-	vss_dds_fill_poly(buffer, sizeof(buffer), &out_2bit_poly, &tw, 1);
+	vss_dds_fill_poly(buffer, sizeof(buffer), &out_2bit_poly, &tw, &attn, 1);
 
-	TEST_ASSERT_EQUAL_HEX(0xAAAAAAAA, buffer[0]);
-	TEST_ASSERT_EQUAL_HEX(0xAAAAAAAA, buffer[1]);
+	TEST_ASSERT_EQUAL_HEX(0x55555555, buffer[0]);
+	TEST_ASSERT_EQUAL_HEX(0x55555555, buffer[1]);
 }
 
 void test_fill_poly_max(void)
@@ -120,11 +121,12 @@ void test_fill_poly_max(void)
 	dds_t buffer[2];
 
 	unsigned tw = wavetable_len/2;
+	int attn = 1;
 
-	vss_dds_fill_poly(buffer, sizeof(buffer), &out_2bit_poly, &tw, 1);
+	vss_dds_fill_poly(buffer, sizeof(buffer), &out_2bit_poly, &tw, &attn, 1);
 
-	TEST_ASSERT_EQUAL_HEX(0x88888888, buffer[0]);
-	TEST_ASSERT_EQUAL_HEX(0x88888888, buffer[1]);
+	TEST_ASSERT_EQUAL_HEX(0x77777777, buffer[0]);
+	TEST_ASSERT_EQUAL_HEX(0x77777777, buffer[1]);
 }
 
 void test_fill_poly_some(void)
@@ -132,11 +134,12 @@ void test_fill_poly_some(void)
 	dds_t buffer[2];
 
 	unsigned tw = wavetable_len/32;
+	int attn = 1;
 
-	vss_dds_fill_poly(buffer, sizeof(buffer), &out_2bit_poly, &tw, 1);
+	vss_dds_fill_poly(buffer, sizeof(buffer), &out_2bit_poly, &tw, &attn, 1);
 
-	TEST_ASSERT_EQUAL_HEX(0xAAAAA540, buffer[0]);
-	TEST_ASSERT_EQUAL_HEX(0x056AAAAA, buffer[1]);
+	TEST_ASSERT_EQUAL_HEX(0x55555ABF, buffer[0]);
+	TEST_ASSERT_EQUAL_HEX(0xFA955555, buffer[1]);
 }
 
 void test_fill_poly_two(void)
@@ -147,8 +150,50 @@ void test_fill_poly_two(void)
 		wavetable_len/32,
 		wavetable_len/16 };
 
-	vss_dds_fill_poly(buffer, sizeof(buffer), &out_2bit_poly, tw, 2);
+	int attn[] = { 1, 1 };
 
-	TEST_ASSERT_EQUAL_HEX(0x6AAAA950, buffer[0]);
-	TEST_ASSERT_EQUAL_HEX(0x15AAAAA5, buffer[1]);
+	vss_dds_fill_poly(buffer, sizeof(buffer), &out_2bit_poly, tw, attn, 2);
+
+	TEST_ASSERT_EQUAL_HEX(0x955556AF, buffer[0]);
+	TEST_ASSERT_EQUAL_HEX(0xEA55555A, buffer[1]);
+}
+
+void test_quantization_1(void)
+{
+	int acc;
+	for(acc = -127; acc < 128; acc++) {
+
+		int i;
+		if(acc > 64) {
+			i = 3;
+		} else if(acc > 0) {
+			i = 2;
+		} else if(acc > -64) {
+			i = 1;
+		} else {
+			i = 0;
+		}
+
+		TEST_ASSERT_EQUAL(i, vss_dds_quant(acc, 1, 4));
+	}
+}
+
+void test_quantization_2(void)
+{
+	int acc;
+	for(acc = -127*2; acc < 128*2; acc++) {
+
+		int i;
+		if(acc > 128) {
+			i = 3;
+		} else if(acc > 0) {
+			i = 2;
+		} else if(acc > -128) {
+			i = 1;
+		} else {
+			i = 0;
+		}
+
+		TEST_ASSERT_EQUAL(i, vss_dds_quant(acc, 2, 4));
+	}
 }
