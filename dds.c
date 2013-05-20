@@ -55,7 +55,7 @@ void vss_dds_fill(dds_t* buffer, size_t size, const struct vss_dds_output* outpu
 
 unsigned vss_dds_quant(int acc, unsigned ch_num, unsigned bits)
 {
-	int q = (acc + (int)256 * ch_num/2 - 1) * (int) bits / (int) ch_num / 256;
+	int q = (acc + 383) * (int) bits / 768;
 	if(q < 0) {
 		return 0;
 	} else if(q > bits - 1) {
@@ -65,9 +65,9 @@ unsigned vss_dds_quant(int acc, unsigned ch_num, unsigned bits)
 	}
 }
 
-void vss_dds_fill_poly(dds_t* buffer, size_t size, unsigned* tw_list, int* attn_list, size_t tw_num)
+void vss_dds_fill_poly(dds_t* buffer, size_t size, unsigned* tw_list, int* attn_list, size_t tw_num, unsigned dsmul)
 {
-	memset(buffer, 0, size);
+	//memset(buffer, 0, size);
 
 	unsigned phase[tw_num];
 	unsigned p;
@@ -82,15 +82,15 @@ void vss_dds_fill_poly(dds_t* buffer, size_t size, unsigned* tw_list, int* attn_
 		for(m = 0; m < tw_num; m++) {
 			if(tw_list[m] > 0) {
 				//printf("ph = %u\n", phase[m]);
-				acc += wavetable[phase[m]] / attn_list[m];
+				acc += wavetable[phase[m]]; // / attn_list[m];
 				//printf("acc = %d\n", (int) acc);
 				phase[m] = (phase[m] + tw_list[m]) % wavetable_len;
 			}
 		}
 
-		const int i = vss_dds_quant(acc, 3, 11);
+		const int i = vss_dds_quant(acc, tw_num, dsmul+1);
 
-		for(m = 0; m < 10; m++) {
+		for(m = 0; m < dsmul; m++) {
 			buffer[p] = m < i;
 			p++;
 			if(p == size) break;

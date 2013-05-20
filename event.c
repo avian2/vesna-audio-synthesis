@@ -13,7 +13,7 @@ void sequencer_init(struct sequencer* seq, float fs)
 	seq->attn_list = calloc(max_channels, sizeof(*seq->attn_list));
 }
 
-void sequencer_next(struct sequencer* seq, dds_t* dds_buffer, size_t dds_buffer_len)
+void sequencer_next(struct sequencer* seq, dds_t* dds_buffer, size_t dds_buffer_len, unsigned dsmul)
 {
 	while(events[seq->cur_event].time == seq->cur_time && seq->cur_event < events_num) {
 		unsigned tw = vss_dds_get_tuning_word(seq->fs, events[seq->cur_event].freq);
@@ -29,9 +29,8 @@ void sequencer_next(struct sequencer* seq, dds_t* dds_buffer, size_t dds_buffer_
 		}
 
 		//fprintf(stderr, "ev %u -> %u\n", tw, i);
-
 		seq->cur_event++;
 	}
 
-	vss_dds_fill_poly(dds_buffer, dds_buffer_len, seq->tw_list, seq->attn_list, max_channels);
+	vss_dds_fill_poly(dds_buffer, dds_buffer_len, seq->tw_list, seq->attn_list, max_channels, dsmul);
 }

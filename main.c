@@ -144,13 +144,13 @@ void exti4_isr(void)
 	static uint32_t p = 0;
 	exti_reset_request(EXTI4);
 
-	if(dds_buffer[p]) {
-		gpio_set(GPIOA, GPIO2);
-	} else {
-		gpio_clear(GPIOA, GPIO2);
-	}
-
 	p = (p + 1) % DDS_BUFF_SIZE;
+
+	if(dds_buffer[p]) {
+		GPIO_BSRR(GPIOA) = GPIO2;
+	} else {
+		GPIO_BRR(GPIOA) = GPIO2;
+	}
 }
 
 /* Provide _write syscall used by libc */
@@ -175,7 +175,8 @@ void delay(void)
 
 int main(void)
 {
-	const float fs = 39.9628e3;
+	const unsigned dsmul = 8;
+	const float fs = 400e3/((float)dsmul);
 
 	setup();
 
@@ -227,7 +228,7 @@ int main(void)
 
 			seq.cur_time = events[seq.cur_event].time;
 
-			sequencer_next(&seq, backbuffer, sizeof(dds_buffer_1));
+			sequencer_next(&seq, backbuffer, sizeof(dds_buffer_1), dsmul);
 
 			int waits = 0;
 			while(seq.cur_time > vss_rtc_read()) waits++;
