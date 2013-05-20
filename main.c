@@ -66,7 +66,7 @@ static const uint8_t init_seq[] = {
 };
 
 //static const unsigned output_words[] = { 3, 3, 1, 0, 2, 2, 2, 2, 0, 1, 3, 3 };
-static const unsigned output_words[] = { 3, 1, 0, 2 };
+static const unsigned output_words[] = { 3, 2, 0, 1 };
 
 static const struct vss_dds_output output = {
 	.bits = 2,
