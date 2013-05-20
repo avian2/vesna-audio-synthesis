@@ -125,8 +125,8 @@ void test_fill_poly_max(void)
 
 	vss_dds_fill_poly(buffer, sizeof(buffer), &out_2bit_poly, &tw, &attn, 1);
 
-	TEST_ASSERT_EQUAL_HEX(0x77777777, buffer[0]);
-	TEST_ASSERT_EQUAL_HEX(0x77777777, buffer[1]);
+	TEST_ASSERT_EQUAL_HEX(0x33333333, buffer[0]);
+	TEST_ASSERT_EQUAL_HEX(0x33333333, buffer[1]);
 }
 
 void test_fill_poly_some(void)
@@ -138,8 +138,19 @@ void test_fill_poly_some(void)
 
 	vss_dds_fill_poly(buffer, sizeof(buffer), &out_2bit_poly, &tw, &attn, 1);
 
-	TEST_ASSERT_EQUAL_HEX(0x55555ABF, buffer[0]);
-	TEST_ASSERT_EQUAL_HEX(0xFA955555, buffer[1]);
+	int words_used[4] = {0,0,0,0};
+
+	int p, w;
+	for(p = 0; p < 2; p++) {
+		for(w = 0; w < 32; w += 2) {
+			unsigned word = (buffer[p] >> w) & 0x3;
+			words_used[word] = 1;
+		}
+	}
+
+	for(w = 0; w < 4; w++) {
+		TEST_ASSERT_TRUE(words_used[w]);
+	}
 }
 
 void test_fill_poly_two(void)
@@ -154,8 +165,19 @@ void test_fill_poly_two(void)
 
 	vss_dds_fill_poly(buffer, sizeof(buffer), &out_2bit_poly, tw, attn, 2);
 
-	TEST_ASSERT_EQUAL_HEX(0x955556AF, buffer[0]);
-	TEST_ASSERT_EQUAL_HEX(0xEA55555A, buffer[1]);
+	int words_used[4] = {0,0,0,0};
+
+	int p, w;
+	for(p = 0; p < 2; p++) {
+		for(w = 0; w < 32; w += 2) {
+			unsigned word = (buffer[p] >> w) & 0x3;
+			words_used[word] = 1;
+		}
+	}
+
+	for(w = 0; w < 4; w++) {
+		TEST_ASSERT_TRUE(words_used[w]);
+	}
 }
 
 void test_quantization_1(void)

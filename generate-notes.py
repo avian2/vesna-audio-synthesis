@@ -48,7 +48,7 @@ def main():
 		elif track == 2:
 			attn = 1
 		else:
-			attn = 2
+			attn = 3
 
 		time = timestamp_to_s(fields[1], ticks_per_qn, us_per_qn)
 
