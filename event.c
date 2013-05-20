@@ -10,6 +10,7 @@ void sequencer_init(struct sequencer* seq, float fs)
 	seq->fs = fs;
 
 	seq->tw_list = calloc(max_channels, sizeof(*seq->tw_list));
+	seq->attn_list = calloc(max_channels, sizeof(*seq->attn_list));
 }
 
 void sequencer_next(struct sequencer* seq, const struct vss_dds_output* output, 
@@ -22,6 +23,7 @@ void sequencer_next(struct sequencer* seq, const struct vss_dds_output* output,
 		if(events[seq->cur_event].type) {
 			while(seq->tw_list[i] != 0 && i < max_channels -1) i++;
 			seq->tw_list[i] = tw;
+			seq->attn_list[i] = events[seq->cur_event].attn;
 		} else {
 			while(seq->tw_list[i] != tw && i < max_channels -1) i++;
 			seq->tw_list[i] = 0;
@@ -32,5 +34,5 @@ void sequencer_next(struct sequencer* seq, const struct vss_dds_output* output,
 		seq->cur_event++;
 	}
 
-	vss_dds_fill_poly(dds_buffer, dds_buffer_len, output, seq->tw_list, max_channels);
+	vss_dds_fill_poly(dds_buffer, dds_buffer_len, output, seq->tw_list, seq->attn_list, max_channels);
 }

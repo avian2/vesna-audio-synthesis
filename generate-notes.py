@@ -41,8 +41,14 @@ def main():
 			us_per_qn = int(fields[3])
 			continue
 
-		if int(fields[0]) == 1:
+		track = int(fields[0])
+
+		if track == 1:
 			continue
+		elif track == 2:
+			attn = 1
+		else:
+			attn = 2
 
 		time = timestamp_to_s(fields[1], ticks_per_qn, us_per_qn)
 
@@ -52,7 +58,7 @@ def main():
 				start = False
 			else:
 				sys.stdout.write(",\n");
-			sys.stdout.write('\t{ .time = %d, .type = 1, .freq = %f }' % (time*1e3, f));
+			sys.stdout.write('\t{ .time = %d, .type = 1, .freq = %f, .attn = %d }' % (time*1e3, f, attn));
 			count += 1
 			channels += 1
 			max_channels = max(max_channels, channels)

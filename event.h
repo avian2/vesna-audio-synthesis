@@ -10,6 +10,7 @@ struct event {
 	uint32_t time;
 	int type;
 	float freq;
+	int attn;
 };
 
 extern const struct event events[];
@@ -25,6 +26,7 @@ struct sequencer {
 	float fs;
 
 	unsigned* tw_list;
+	int* attn_list;
 };
 
 void sequencer_init(struct sequencer* seq, float fs);

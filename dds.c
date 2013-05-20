@@ -53,7 +53,7 @@ void vss_dds_fill(dds_t* buffer, size_t size, const struct vss_dds_output* outpu
 	}
 }
 
-void vss_dds_fill_poly(dds_t* buffer, size_t size, const struct vss_dds_output* output, unsigned* tw_list, size_t tw_num)
+void vss_dds_fill_poly(dds_t* buffer, size_t size, const struct vss_dds_output* output, unsigned* tw_list, int* attn_list, size_t tw_num)
 {
 	memset(buffer, 0, size);
 
@@ -73,7 +73,7 @@ void vss_dds_fill_poly(dds_t* buffer, size_t size, const struct vss_dds_output* 
 		for(m = 0; m < tw_num; m++) {
 			if(tw_list[m] > 0) {
 				//printf("ph = %u\n", phase[m]);
-				acc += wavetable[phase[m]];
+				acc += wavetable[phase[m]] / attn_list[m];
 				//printf("acc = %d\n", (int) acc);
 				phase[m] = (phase[m] + tw_list[m]) % wavetable_len;
 			}
