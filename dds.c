@@ -58,7 +58,7 @@ unsigned vss_dds_quant(int acc, unsigned ch_num, unsigned bits)
 	int q = (acc + (int)256 * ch_num/2 - 1) * (int) bits / (int) ch_num / 256;
 	if(q < 0) {
 		return 0;
-	} else if(q > bits - 1) {
+	} else if(q > ((int) bits) - 1) {
 		return bits - 1;
 	} else {
 		return q;
