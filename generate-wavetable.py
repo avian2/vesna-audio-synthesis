@@ -6,7 +6,7 @@ length = int(sys.argv[1])
 values = []
 for n in xrange(length):
 	v = math.cos(2.0*math.pi*float(n)/float(length))*0.8
-	#v += math.cos(4.0*math.pi*float(n)/float(length))*0.4
+	v += math.cos(4.0*math.pi*float(n)/float(length))*0.4
 	#v += math.cos(6.0*math.pi*float(n)/float(length))*0.2
 	#v += math.cos(8.0*math.pi*float(n)/float(length))*0.1
 
