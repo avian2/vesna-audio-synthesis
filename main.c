@@ -132,24 +132,34 @@ static void setup(void)
 	setup_radio();
 }
 
-#define DDS_BUFF_SIZE	20480
+#define DDS_BUFF_SIZE	2048
 
 dds_t *dds_buffer;
 
 dds_t dds_buffer_1[DDS_BUFF_SIZE];
 dds_t dds_buffer_2[DDS_BUFF_SIZE];
 
+static const unsigned dsmul = 16;
+
 void exti4_isr(void)
 {
 	static uint32_t p = 0;
+	static uint32_t w = 1;
+
 	exti_reset_request(EXTI4);
 
-	if(dds_buffer[p]) {
+	if(w > dds_buffer[p]) {
 		GPIO_BSRR(GPIOA) = GPIO2;
 	} else {
 		GPIO_BRR(GPIOA) = GPIO2;
 	}
-	p = (p + 1) % DDS_BUFF_SIZE;
+
+	if(w <= dsmul) {
+		w++;
+	} else {
+		w = 1;
+		p = (p + 1) % DDS_BUFF_SIZE;
+	}
 }
 
 /* Provide _write syscall used by libc */
@@ -174,7 +184,6 @@ void delay(void)
 
 int main(void)
 {
-	const unsigned dsmul = 8;
 	const float fs = 400e3/((float)dsmul);
 
 	setup();
@@ -191,19 +200,14 @@ int main(void)
 
 	/*
 	int n, p = 0;
-	int tw = 35;
-	const int ps = DDS_BUFF_SIZE/wavetable_len;
-	for(n = 0; n < wavetable_len; n++) {
-		int m;
+	int tw = 1;
+	for(n = 0; n < DDS_BUFF_SIZE; n++) {
 		int v = wavetable[(n*tw)%wavetable_len];
-		v += 127;
+		v = (v + 127)*dsmul/254;
 
-		int pt = v*ps/254;
+		printf("%d\n", v);
 
-		for(m = 0; m < ps; m++) {
-			dds_buffer[p] = m > pt;
-			p++;
-		}
+		dds_buffer[n] = v;
 	}
 	*/
 
