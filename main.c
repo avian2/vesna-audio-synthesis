@@ -139,7 +139,7 @@ dds_t *dds_buffer;
 dds_t dds_buffer_1[DDS_BUFF_SIZE];
 dds_t dds_buffer_2[DDS_BUFF_SIZE];
 
-static const unsigned dsmul = 16;
+static const unsigned dsmul = 17;
 
 void exti4_isr(void)
 {
@@ -197,19 +197,6 @@ int main(void)
 
 	dds_t *backbuffer = dds_buffer_1;
 	dds_buffer = dds_buffer_2;
-
-	/*
-	int n, p = 0;
-	int tw = 1;
-	for(n = 0; n < DDS_BUFF_SIZE; n++) {
-		int v = wavetable[(n*tw)%wavetable_len];
-		v = (v + 127)*dsmul/254;
-
-		printf("%d\n", v);
-
-		dds_buffer[n] = v;
-	}
-	*/
 
 	int ch = 25;
 
