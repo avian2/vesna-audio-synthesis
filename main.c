@@ -184,7 +184,7 @@ void delay(void)
 
 int main(void)
 {
-	const float fs = 400e3/((float)dsmul);
+	const float fs = 400e3/((float)dsmul-1);
 
 	setup();
 

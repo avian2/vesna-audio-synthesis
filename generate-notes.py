@@ -2,8 +2,6 @@ import sys
 import numpy
 import struct
 
-fs = 43.9796e3
-
 def note_to_f(note):
 	return (2.0**((float(note)-69.0)/12.0)) * 440.0
 
