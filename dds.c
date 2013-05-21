@@ -86,7 +86,7 @@ void vss_dds_fill_poly(dds_t* buffer, size_t size, unsigned* tw_list, int* attn_
 			}
 		}
 
-		buffer[p] = vss_dds_quant(acc, 3, dsmul);
+		buffer[p] = vss_dds_quant(acc, 4, dsmul+1);
 		p++;
 	}
 }

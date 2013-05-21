@@ -139,7 +139,7 @@ dds_t *dds_buffer;
 dds_t dds_buffer_1[DDS_BUFF_SIZE];
 dds_t dds_buffer_2[DDS_BUFF_SIZE];
 
-static const unsigned dsmul = 17;
+static const unsigned dsmul = 16;
 
 void exti4_isr(void)
 {
@@ -184,7 +184,7 @@ void delay(void)
 
 int main(void)
 {
-	const float fs = 400e3/((float)dsmul-1);
+	const float fs = 400e3/((float)dsmul);
 
 	setup();
 
