@@ -132,7 +132,7 @@ static void setup(void)
 	setup_radio();
 }
 
-#define DDS_BUFF_SIZE	2048
+#define DDS_BUFF_SIZE	1024
 
 dds_t *dds_buffer;
 
