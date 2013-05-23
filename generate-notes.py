@@ -49,6 +49,7 @@ def main():
 			attn = 3
 
 		time = timestamp_to_s(fields[1], ticks_per_qn, us_per_qn)
+		time += 2
 
 		if cmd == 'Note_on_c':
 			f = note_to_f(fields[4])
