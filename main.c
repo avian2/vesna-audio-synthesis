@@ -154,7 +154,7 @@ void exti4_isr(void)
 		GPIO_BRR(GPIOA) = GPIO2;
 	}
 
-	if(w <= dsmul) {
+	if(w < dsmul) {
 		w++;
 	} else {
 		w = 1;
