@@ -62,6 +62,7 @@ static const uint8_t init_seq[] = {
 	CC_REG_FSCAL0,   0x1F,     // Frequency Synthesizer Calibration
 	CC_REG_TEST2,    0x81,     // Various Test Settings
 	CC_REG_TEST1,    0x35,     // Various Test Settings
+	CC_REG_PATABLE,  0x26,
 	0xFF, 0x0FF
 };
 
