@@ -27,27 +27,27 @@
  * Preamble count = 4 
  * Whitening = false 
  * Address config = No address check 
- * Carrier frequency = 779.999908 
+ * Carrier frequency = 863.968277
  * Device address = 0 
- * TX power = 0 
+ * TX power = -10
  * Manchester enable = false 
  * CRC enable = false 
  * Deviation = 32.958984 
  * Packet length mode = Infinite packet length mode 
  * Packet length = 255 
  * Modulation format = 2-FSK
- * Base frequency = 779.999908 
+ * Base frequency = 829.999924
  * Modulated = true 
- * Channel number = 0 */
-static const uint8_t init_seq[] = {
+ * Channel number = 170 */
+uint8_t init_seq[] = {
 	CC_REG_IOCFG2,   0x0B,     // GDO2 Output Pin Configuration
 	CC_REG_IOCFG0,   0x0C,     // GDO0 Output Pin Configuration
 	CC_REG_FIFOTHR,  0x47,     // RX FIFO and TX FIFO Thresholds
 	CC_REG_PKTCTRL0, 0x12,     // Packet Automation Control
+	CC_REG_CHANNR,   0xAA,     // Channel Number
 	CC_REG_FSCTRL1,  0x06,     // Frequency Synthesizer Control
-	CC_REG_FREQ2,    0x1C,     // Frequency Control Word, High Byte
-	CC_REG_FREQ1,    0xE3,     // Frequency Control Word, Middle Byte
-	CC_REG_FREQ0,    0x8E,     // Frequency Control Word, Low Byte
+	CC_REG_FREQ1,    0xBD,     // Frequency Control Word, Middle Byte
+	CC_REG_FREQ0,    0xA1,     // Frequency Control Word, Low Byte
 	CC_REG_MDMCFG4,  0x8D,     // Modem Configuration
 	CC_REG_MDMCFG3,  0xE5,     // Modem Configuration
 	CC_REG_MDMCFG2,  0x00,     // Modem Configuration
@@ -198,13 +198,6 @@ int main(void)
 
 	dds_t *backbuffer = dds_buffer_1;
 	dds_buffer = dds_buffer_2;
-
-	int ch = 25;
-
-	vss_cc_strobe(CC_STROBE_SIDLE);
-	vss_cc_wait_state(CC_MARCSTATE_IDLE);
-
-	vss_cc_write_reg(CC_REG_CHANNR, ch);
 
 	vss_cc_strobe(CC_STROBE_STX);
 	vss_cc_wait_state(CC_MARCSTATE_TX);
