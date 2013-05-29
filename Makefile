@@ -1,4 +1,4 @@
-BINARY = vesna-fm-synthesis
+BINARY = vesna-audio-synthesis
 
 PREFIX		?= arm-none-eabi
 CC		= $(PREFIX)-gcc
