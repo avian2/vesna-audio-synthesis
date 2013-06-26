@@ -55,49 +55,48 @@ void vss_dds_fill(dds_t* buffer, size_t size, const struct vss_dds_output* outpu
 
 unsigned vss_dds_quant(int acc, unsigned ch_num, unsigned bits)
 {
-	int q = (acc + (int)256 * ch_num/2 - 1) * (int) bits / (int) ch_num / 256;
+	int q = (acc + 256 * ((int) ch_num)/2 - 1) * ((int) bits) / ((int) ch_num) / 256;
 	if(q < 0) {
 		return 0;
-	} else if(q > ((int) bits) - 1) {
+	} else if(q > ((int) bits - 1)) {
 		return bits - 1;
 	} else {
 		return q;
 	}
 }
 
-void vss_dds_fill_poly(dds_t* buffer, size_t size, const struct vss_dds_output* output, unsigned* tw_list, int* attn_list, size_t tw_num)
+/** @brief Mix multiple waveforms into a DDS buffer.
+ *
+ * @param buffer Pointer to the buffer to fill.
+ * @param size Size of the buffer array in bytes.
+ * @param tw_list Array of tuning words of signals to mix.
+ * @param attn_list Array of attenuations for signals to mix (1: no attenuation, 2: -6 dB attenuation, ...)
+ * @param tw_num Number of signals (lengths of tw_list and attn_list arrays).
+ * @param dsmul Number of output levels.
+ * @param ampl_corr Signal amplitude correction. */
+void vss_dds_fill_poly(dds_t* buffer, size_t size, unsigned* tw_list, int* attn_list, size_t tw_num, unsigned dsmul, unsigned ampl_corr)
 {
-	memset(buffer, 0, size);
-
-	const unsigned dds_size = get_dds_size(size, output->bits);
-	const unsigned dds_word_size = get_dds_word_size(output->bits);
-
 	unsigned phase[tw_num];
-	unsigned n;
+	unsigned p;
 
 	memset(phase, 0, sizeof(phase));
 
-	for(n = 0; n < dds_size; n++) {
-
+	p = 0;
+	while(p < size) {
 		unsigned m;
 		int acc = 0;
 
 		for(m = 0; m < tw_num; m++) {
 			if(tw_list[m] > 0) {
 				//printf("ph = %u\n", phase[m]);
-				acc += wavetable[phase[m]] / attn_list[m];
+				acc += wavetable[phase[m]]; // / attn_list[m];
 				//printf("acc = %d\n", (int) acc);
 				phase[m] = (phase[m] + tw_list[m]) % wavetable_len;
 			}
 		}
 
-		const int i = vss_dds_quant(acc, 3, output->size);
-		
-		const unsigned ow = output->words[i];
+		buffer[p] = vss_dds_quant(acc, tw_num - ampl_corr, dsmul+1);
 
-		const unsigned p = n / dds_word_size;
-		const unsigned w = n % dds_word_size * output->bits;
-
-		buffer[p] |= (ow << w);
+		p++;
 	}
 }

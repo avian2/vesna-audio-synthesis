@@ -2,8 +2,6 @@ import sys
 import numpy
 import struct
 
-fs = 43.9796e3
-
 def note_to_f(note):
 	return (2.0**((float(note)-69.0)/12.0)) * 440.0
 
@@ -51,6 +49,7 @@ def main():
 			attn = 3
 
 		time = timestamp_to_s(fields[1], ticks_per_qn, us_per_qn)
+		time += 2
 
 		if cmd == 'Note_on_c':
 			f = note_to_f(fields[4])

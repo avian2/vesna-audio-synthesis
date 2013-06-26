@@ -31,6 +31,5 @@ struct sequencer {
 
 void sequencer_init(struct sequencer* seq, float fs);
 
-void sequencer_next(struct sequencer* seq, const struct vss_dds_output* output, 
-						dds_t* dds_buffer, size_t dds_buffer_len);
+void sequencer_next(struct sequencer* seq, dds_t* dds_buffer, size_t dds_buffer_len, unsigned dsmul);
 #endif
