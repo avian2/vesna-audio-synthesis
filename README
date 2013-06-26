@@ -1,0 +1,74 @@
+This is a small demonstration of a wide-band analog FM signal transmission
+using the CC1101 transceiver.
+
+An audio signal is generated using a 6-channel wavetable synthesizer
+implemented in software at 25 kHz sample rate and 4-bit resolution.
+
+Audio signal is then upconverted to an 400 bps binary stream using a
+delta-sigma modulator and sent to the CC1101 using a bit-banging
+protocol through GPIO lines.
+
+CC1101 is configured for 2FSK, infinite packet length. It is tuned to 864 MHz
+(European channel for unlicensed wireless microphones) and the FM deviation is
+set to conform to typical studio microphone transmissions.
+
+As is, this demo requires a VESNA wireless sensor node with SNE-ISMTV-868
+expansion. It should be easy to adapt to any platform with the CC1101
+transceiver.
+
+
+How to use
+==========
+
+To compile
+
+$ make
+
+To run unit tests (you need Unity installed in a directory along side
+vesna-audio-synthesis)
+
+$ make test
+
+To flash to a VESNA node using OpenOCD and Olimex ARM-USB-OCD:
+
+$ make vesna-audio-synthesis.u
+
+
+You can also run the demo on any Linux computer using an ALSA device instead
+of the CC1101 transceiver:
+
+$ cd tests
+$ make vesna-audio-synthesis-host
+$ ./vesna-audio-synthesis-host | aplay -r25000
+
+
+License
+=======
+
+Source code:
+
+Copyright (C) 2013 SensorLab, Jozef Stefan Institute
+http://sensorlab.ijs.si
+
+Copyright (C) 2013 Tomaz Solc <tomaz.solc@tablix.org>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+Music:
+
+"Smile Song" original music by Daniel Ingram.
+
+Event list generated from MIDI transcription by Reedmace Star and WeimTime007.
+http://reedmacestar.blogspot.com/2012/05/smile-song-transcription.html
