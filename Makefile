@@ -44,6 +44,9 @@ clean:
 	rm -f *.elf
 	rm -f *.bin
 
+test:
+	$(MAKE) -C tests test
+
 %.u: %.bin
 	$(OPENOCD) $(OPENOCD_PARAMS) -c "\
 		reset_config trst_and_srst; \
@@ -56,6 +59,6 @@ clean:
 		shutdown \
 	"
 
-.PHONY: clean
+.PHONY: clean test
 
 -include $(OBJS:.o=.d)
