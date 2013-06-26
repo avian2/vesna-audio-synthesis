@@ -65,7 +65,16 @@ unsigned vss_dds_quant(int acc, unsigned ch_num, unsigned bits)
 	}
 }
 
-void vss_dds_fill_poly(dds_t* buffer, size_t size, unsigned* tw_list, int* attn_list, size_t tw_num, unsigned dsmul)
+/** @brief Mix multiple waveforms into a DDS buffer.
+ *
+ * @param buffer Pointer to the buffer to fill.
+ * @param size Size of the buffer array in bytes.
+ * @param tw_list Array of tuning words of signals to mix.
+ * @param attn_list Array of attenuations for signals to mix (1: no attenuation, 2: -6 dB attenuation, ...)
+ * @param tw_num Number of signals (lengths of tw_list and attn_list arrays).
+ * @param dsmul Number of output levels.
+ * @param ampl_corr Signal amplitude correction. */
+void vss_dds_fill_poly(dds_t* buffer, size_t size, unsigned* tw_list, int* attn_list, size_t tw_num, unsigned dsmul, unsigned ampl_corr)
 {
 	unsigned phase[tw_num];
 	unsigned p;
@@ -86,7 +95,8 @@ void vss_dds_fill_poly(dds_t* buffer, size_t size, unsigned* tw_list, int* attn_
 			}
 		}
 
-		buffer[p] = vss_dds_quant(acc, 5, dsmul+1);
+		buffer[p] = vss_dds_quant(acc, tw_num - ampl_corr, dsmul+1);
+
 		p++;
 	}
 }

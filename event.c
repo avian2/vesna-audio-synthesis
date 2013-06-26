@@ -32,5 +32,5 @@ void sequencer_next(struct sequencer* seq, dds_t* dds_buffer, size_t dds_buffer_
 		seq->cur_event++;
 	}
 
-	vss_dds_fill_poly(dds_buffer, dds_buffer_len, seq->tw_list, seq->attn_list, max_channels, dsmul);
+	vss_dds_fill_poly(dds_buffer, dds_buffer_len, seq->tw_list, seq->attn_list, max_channels, dsmul, 1);
 }
