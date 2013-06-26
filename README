@@ -4,7 +4,7 @@ using the CC1101 transceiver.
 An audio signal is generated using a 6-channel wavetable synthesizer
 implemented in software at 25 kHz sample rate and 4-bit resolution.
 
-Audio signal is then upconverted to an 400 bps binary stream using a
+Audio signal is then upconverted to an 400 kbps binary stream using a
 delta-sigma modulator and sent to the CC1101 using a bit-banging
 protocol through GPIO lines.
 
@@ -15,6 +15,9 @@ set to conform to typical studio microphone transmissions.
 As is, this demo requires a VESNA wireless sensor node with SNE-ISMTV-868
 expansion. It should be easy to adapt to any platform with the CC1101
 transceiver.
+
+A video demonstration can be seen here:
+https://www.youtube.com/watch?v=gwk1oZbig28
 
 
 How to use
@@ -32,6 +35,11 @@ $ make test
 To flash to a VESNA node using OpenOCD and Olimex ARM-USB-OCD:
 
 $ make vesna-audio-synthesis.u
+
+
+If you don't have a hardware FM receiver for the UHF range there are GNU Radio
+examples in the receiver/ subdirectory that can be used with USRP or OsmoSDR
+devices to receive and demodulate the transmission.
 
 
 You can also run the demo on any Linux computer using an ALSA device instead
