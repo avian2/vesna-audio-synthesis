@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 /* Author: Tomaz Solc, <tomaz.solc@ijs.si> */
+#include <string.h>
+
 #include "unity.h"
 #include "dds.h"
 #include "wavetable.h"
@@ -33,14 +35,6 @@ static const struct vss_dds_output out_2bit = {
 	.bits = 2,
 	.size = sizeof(out_2bit_words)/sizeof(*out_2bit_words),
 	.words = out_2bit_words
-};
-
-const unsigned out_2bit_words_poly[] = { 0, 1, 2, 3 };
-
-static const struct vss_dds_output out_2bit_poly = {
-	.bits = 2,
-	.size = sizeof(out_2bit_words_poly)/sizeof(*out_2bit_words_poly),
-	.words = out_2bit_words_poly
 };
 
 void setUp(void)
@@ -69,8 +63,8 @@ void test_fill_min_1(void)
 
 	vss_dds_fill(buffer, sizeof(buffer), &out_1bit, 1);
 
-	TEST_ASSERT_EQUAL_HEX(0x0000FFFF, buffer[0]);
-	TEST_ASSERT_EQUAL_HEX(0xFFFF0000, buffer[1]);
+	TEST_ASSERT_EQUAL_HEX((dds_t) 0x0F, buffer[0]);
+	TEST_ASSERT_EQUAL_HEX((dds_t) 0xF0, buffer[1]);
 }
 
 void test_fill_max_1(void)
@@ -79,104 +73,124 @@ void test_fill_max_1(void)
 
 	vss_dds_fill(buffer, sizeof(buffer), &out_1bit, sizeof(buffer)*8/2);
 
-	TEST_ASSERT_EQUAL_HEX(0x55555555, buffer[0]);
-	TEST_ASSERT_EQUAL_HEX(0x55555555, buffer[1]);
+	TEST_ASSERT_EQUAL_HEX((dds_t) 0x55, buffer[0]);
+	TEST_ASSERT_EQUAL_HEX((dds_t) 0x55, buffer[1]);
 }
 
 void test_fill_min_2(void)
 {
-	dds_t buffer[2];
+	dds_t buffer[8];
 
 	vss_dds_fill(buffer, sizeof(buffer), &out_2bit, 1);
 
-	TEST_ASSERT_EQUAL_HEX(0x0015AFFF, buffer[0]);
-	TEST_ASSERT_EQUAL_HEX(0xFFEA5000, buffer[1]);
+	TEST_ASSERT_EQUAL_HEX((dds_t) 0xFF, buffer[0]);
+	TEST_ASSERT_EQUAL_HEX((dds_t) 0xAF, buffer[1]);
+	TEST_ASSERT_EQUAL_HEX((dds_t) 0x15, buffer[2]);
+	TEST_ASSERT_EQUAL_HEX((dds_t) 0x00, buffer[3]);
+
+	TEST_ASSERT_EQUAL_HEX((dds_t) 0x00, buffer[4]);
+	TEST_ASSERT_EQUAL_HEX((dds_t) 0x50, buffer[5]);
+	TEST_ASSERT_EQUAL_HEX((dds_t) 0xEA, buffer[6]);
+	TEST_ASSERT_EQUAL_HEX((dds_t) 0xFF, buffer[7]);
 }
 
 void test_fill_max_2(void)
 {
-	dds_t buffer[2];
+	dds_t buffer[8];
 
 	vss_dds_fill(buffer, sizeof(buffer), &out_2bit, sizeof(buffer)*8/4);
 
-	TEST_ASSERT_EQUAL_HEX(0x33333333, buffer[0]);
-	TEST_ASSERT_EQUAL_HEX(0x33333333, buffer[1]);
+	TEST_ASSERT_EQUAL_HEX((dds_t) 0x33, buffer[0]);
+	TEST_ASSERT_EQUAL_HEX((dds_t) 0x33, buffer[1]);
+	TEST_ASSERT_EQUAL_HEX((dds_t) 0x33, buffer[2]);
+	TEST_ASSERT_EQUAL_HEX((dds_t) 0x33, buffer[3]);
+
+	TEST_ASSERT_EQUAL_HEX((dds_t) 0x33, buffer[4]);
+	TEST_ASSERT_EQUAL_HEX((dds_t) 0x33, buffer[5]);
+	TEST_ASSERT_EQUAL_HEX((dds_t) 0x33, buffer[6]);
+	TEST_ASSERT_EQUAL_HEX((dds_t) 0x33, buffer[7]);
 }
 
 void test_fill_poly_zero(void)
 {
-	dds_t buffer[2];
+	dds_t buffer[4];
 
 	unsigned tw = 0;
 	int attn = 1;
 
-	vss_dds_fill_poly(buffer, sizeof(buffer), &out_2bit_poly, &tw, &attn, 1);
+	vss_dds_fill_poly(buffer, sizeof(buffer), &tw, &attn, 1, 255, 0);
 
-	TEST_ASSERT_EQUAL_HEX(0x55555555, buffer[0]);
-	TEST_ASSERT_EQUAL_HEX(0x55555555, buffer[1]);
+	TEST_ASSERT_EQUAL(127, buffer[0]);
+	TEST_ASSERT_EQUAL(127, buffer[1]);
+	TEST_ASSERT_EQUAL(127, buffer[2]);
+	TEST_ASSERT_EQUAL(127, buffer[3]);
 }
 
 void test_fill_poly_max(void)
 {
-	dds_t buffer[2];
+	dds_t buffer[4];
 
 	unsigned tw = wavetable_len/2;
 	int attn = 1;
 
-	vss_dds_fill_poly(buffer, sizeof(buffer), &out_2bit_poly, &tw, &attn, 1);
+	vss_dds_fill_poly(buffer, sizeof(buffer), &tw, &attn, 1, 255, 0);
 
-	TEST_ASSERT_EQUAL_HEX(0x33333333, buffer[0]);
-	TEST_ASSERT_EQUAL_HEX(0x33333333, buffer[1]);
+	TEST_ASSERT_EQUAL((dds_t) (127 + wavetable[0]), buffer[0]);
+	TEST_ASSERT_EQUAL((dds_t) (127 + wavetable[512]), buffer[1]);
+	TEST_ASSERT_EQUAL((dds_t) (127 + wavetable[0]), buffer[2]);
+	TEST_ASSERT_EQUAL((dds_t) (127 + wavetable[512]), buffer[3]);
 }
 
 void test_fill_poly_some(void)
 {
-	dds_t buffer[2];
+	unsigned dsmul = 8;
+	unsigned buffer_len = 128;
+
+	dds_t buffer[buffer_len];
 
 	unsigned tw = wavetable_len/32;
 	int attn = 1;
 
-	vss_dds_fill_poly(buffer, sizeof(buffer), &out_2bit_poly, &tw, &attn, 1);
+	vss_dds_fill_poly(buffer, sizeof(buffer), &tw, &attn, 1, dsmul, 0);
 
-	int words_used[4] = {0,0,0,0};
+	int words_used[dsmul+1];
+	memset(words_used, 0, sizeof(words_used));
 
-	int p, w;
-	for(p = 0; p < 2; p++) {
-		for(w = 0; w < 32; w += 2) {
-			unsigned word = (buffer[p] >> w) & 0x3;
-			words_used[word] = 1;
-		}
+	int p;
+	for(p = 0; p < buffer_len; p++) {
+		words_used[(unsigned) buffer[p]]++;
 	}
 
-	for(w = 0; w < 4; w++) {
-		TEST_ASSERT_TRUE(words_used[w]);
+	for(p = 0; p < dsmul + 1; p++) {
+		TEST_ASSERT_TRUE(words_used[p]);
 	}
 }
 
 void test_fill_poly_two(void)
 {
-	dds_t buffer[2];
+	unsigned dsmul = 8;
+	unsigned buffer_len = 256;
+
+	dds_t buffer[buffer_len];
 
 	unsigned tw[] = {
 		wavetable_len/32,
-		wavetable_len/16 };
+		wavetable_len/17 };
 
 	int attn[] = { 1, 1 };
 
-	vss_dds_fill_poly(buffer, sizeof(buffer), &out_2bit_poly, tw, attn, 2);
+	vss_dds_fill_poly(buffer, sizeof(buffer), tw, attn, 2, dsmul, 0);
 
-	int words_used[4] = {0,0,0,0};
+	int words_used[dsmul+1];
+	memset(words_used, 0, sizeof(words_used));
 
-	int p, w;
-	for(p = 0; p < 2; p++) {
-		for(w = 0; w < 32; w += 2) {
-			unsigned word = (buffer[p] >> w) & 0x3;
-			words_used[word] = 1;
-		}
+	int p;
+	for(p = 0; p < buffer_len; p++) {
+		words_used[(unsigned) buffer[p]]++;
 	}
 
-	for(w = 0; w < 4; w++) {
-		TEST_ASSERT_TRUE(words_used[w]);
+	for(p = 0; p < dsmul + 1; p++) {
+		TEST_ASSERT_TRUE(words_used[p]);
 	}
 }
 
