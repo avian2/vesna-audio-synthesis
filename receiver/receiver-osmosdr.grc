@@ -61,7 +61,7 @@
     </param>
   </block>
   <block>
-    <key>blks2_fm_demod_cf</key>
+    <key>analog_fm_demod_cf</key>
     <param>
       <key>id</key>
       <value>blks2_fm_demod_cf_0</value>
@@ -268,7 +268,7 @@
     </param>
   </block>
   <block>
-    <key>osmosdr_source_c</key>
+    <key>osmosdr_source</key>
     <param>
       <key>id</key>
       <value>osmosdr_source_c_0</value>
@@ -483,7 +483,7 @@
     </param>
   </block>
   <block>
-    <key>blks2_rational_resampler_xxx</key>
+    <key>rational_resampler_xxx</key>
     <param>
       <key>id</key>
       <value>blks2_rational_resampler_xxx_0</value>
